@@ -29,6 +29,7 @@ var (
 	p1USBDevicePath = kingpin.Flag("antenna-usb-device-path", "Path to usb device connecting to P1 device.").Default("/dev/ttyUSB0").OverrideDefaultFromEnvar("P1_USB_DEVICE_PATH").String()
 
 	bigqueryEnable    = kingpin.Flag("bigquery-enable", "Toggle to enable or disable bigquery integration").Default("true").OverrideDefaultFromEnvar("BQ_ENABLE").Bool()
+	bigqueryInit      = kingpin.Flag("bigquery-init", "Toggle to enable bigquery table initialization").Default("true").OverrideDefaultFromEnvar("BQ_INIT").Bool()
 	bigqueryProjectID = kingpin.Flag("bigquery-project-id", "Google Cloud project id that contains the BigQuery dataset").Envar("BQ_PROJECT_ID").Required().String()
 	bigqueryDataset   = kingpin.Flag("bigquery-dataset", "Name of the BigQuery dataset").Envar("BQ_DATASET").Required().String()
 	bigqueryTable     = kingpin.Flag("bigquery-table", "Name of the BigQuery table").Envar("BQ_TABLE").Required().String()
@@ -69,9 +70,11 @@ func main() {
 	}
 
 	// init bigquery table if it doesn't exist yet
-	err = bigqueryClient.InitBigqueryTable(ctx, *bigqueryDataset, *bigqueryTable)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed initializing bigquery table")
+	if *bigqueryInit {
+		err = bigqueryClient.InitBigqueryTable(ctx, *bigqueryDataset, *bigqueryTable)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed initializing bigquery table")
+		}
 	}
 
 	// create kubernetes api client

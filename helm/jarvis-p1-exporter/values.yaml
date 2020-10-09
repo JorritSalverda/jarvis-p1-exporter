@@ -9,6 +9,7 @@ cronjob:
 
 config:
   bqEnable: false
+  bqInit: true
   bqProjectID: gcp-project-id
   bqDataset: jarvis
   bqTable: jarvis_measurements
