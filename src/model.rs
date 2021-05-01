@@ -85,15 +85,7 @@ pub struct ConfigSample {
 
     // modbus specific config for sample
     pub value_multiplier: f64,
-    pub register_type: RegisterType,
-    pub register_address: u16,
-    pub register_quantity: u16,
-}
-
-#[derive(Copy, Clone, PartialEq, Serialize, Deserialize, Debug)]
-pub enum RegisterType {
-    #[serde(rename = "input")]
-    Input,
-    #[serde(rename = "holding")]
-    Holding,
+    pub prefix: String,
+    pub value_start_index: u16,
+    pub value_length: u16,
 }

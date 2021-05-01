@@ -18,11 +18,21 @@ stages:
         image: extensions/helm:stable
         action: package
 
-      bake:
-        image: extensions/docker:stable
-        action: build
-        repositories:
-        - jsalverda
+  # clone-charts-repo:
+  #   image: extensions/git-clone:stable
+  #   repo: helm-charts
+  #   branch: master
+
+  # publish-helm-chart:
+  #   image: extensions/helm:stable
+  #   action: publish
+  #   repoUrl: https://helm.jorritsalverda.com/
+
+  bake:
+    image: extensions/docker:stable
+    action: build
+    repositories:
+    - jsalverda
 
   push-to-docker-hub:
     image: extensions/docker:stable
@@ -42,13 +52,3 @@ stages:
   #   values: |-
   #     secret:
   #       gcpServiceAccountKeyfile: '{}'
-
-  # clone-charts-repo:
-  #   image: extensions/git-clone:stable
-  #   repo: helm-charts
-  #   branch: master
-
-  # publish-helm-chart:
-  #   image: extensions/helm:stable
-  #   action: publish
-  #   repoUrl: https://helm.jorritsalverda.com/

@@ -212,7 +212,10 @@ impl BigqueryClient {
         Ok(())
     }
 
-    pub async fn insert_measurement(&self, measurement: &Measurement) -> Result<(), Box<dyn Error>> {
+    pub async fn insert_measurement(
+        &self,
+        measurement: &Measurement,
+    ) -> Result<(), Box<dyn Error>> {
         if !self.config.enable {
             return Ok(());
         }
@@ -222,14 +225,18 @@ impl BigqueryClient {
 
         self.config
             .client
-          .tabledata()
-          .insert_all(&self.config.project_id, &self.config.dataset, &self.config.table, insert_request)
-          .await?;
+            .tabledata()
+            .insert_all(
+                &self.config.project_id,
+                &self.config.dataset,
+                &self.config.table,
+                insert_request,
+            )
+            .await?;
 
         println!(
             "Inserted measurement {:#?} into bigquery table {}",
-            &measurement,
-            &self.config.table
+            &measurement, &self.config.table
         );
 
         Ok(())

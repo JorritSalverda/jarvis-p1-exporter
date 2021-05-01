@@ -2,14 +2,14 @@ use std::error::Error;
 
 use crate::bigquery_client::BigqueryClient;
 use crate::config_client::ConfigClient;
-use crate::modbus_client::ModbusClient;
+use crate::p1_client::P1Client;
 use crate::state_client::StateClient;
 
 pub struct ExporterServiceConfig {
     config_client: ConfigClient,
     bigquery_client: BigqueryClient,
     state_client: StateClient,
-    modbus_client: ModbusClient,
+    p1_client: P1Client,
 }
 
 impl ExporterServiceConfig {
@@ -17,13 +17,13 @@ impl ExporterServiceConfig {
         config_client: ConfigClient,
         bigquery_client: BigqueryClient,
         state_client: StateClient,
-        modbus_client: ModbusClient,
+        p1_client: P1Client,
     ) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             config_client,
             bigquery_client,
             state_client,
-            modbus_client,
+            p1_client,
         })
     }
 }
@@ -46,12 +46,13 @@ impl ExporterService {
 
         let measurement = self
             .config
-            .modbus_client
+            .p1_client
             .get_measurement(config, last_measurement)?;
 
         self.config
             .bigquery_client
-            .insert_measurement(&measurement).await?;
+            .insert_measurement(&measurement)
+            .await?;
 
         self.config.state_client.store_state(&measurement).await?;
 

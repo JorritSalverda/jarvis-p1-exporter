@@ -17,9 +17,9 @@ RUN ls -latr /app/target/x86_64-unknown-linux-musl/release/
 # Step 2: Create the runtime container image
 FROM scratch AS runtime
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/jarvis-modbus-exporter .
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/jarvis-p1-exporter .
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 USER 1000
 
-ENTRYPOINT ["./jarvis-modbus-exporter"]
+ENTRYPOINT ["./jarvis-p1-exporter"]
