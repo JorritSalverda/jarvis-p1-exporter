@@ -1,7 +1,5 @@
-use crate::model::{Config, ConfigSample, Measurement, MetricType, Sample};
-use byteorder::{BigEndian, ByteOrder};
+use crate::model::{Config, Measurement, MetricType, Sample};
 use chrono::Utc;
-use conv::*;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
@@ -72,13 +70,17 @@ impl P1Client {
                                 }
 
                                 if line.len()
-                                    < (sample_config.value_start_index + sample_config.value_length).into()
+                                    < (sample_config.value_start_index + sample_config.value_length)
+                                        .into()
                                 {
                                     println!("Line with length {} is too short to extract value for reading '{}'", line.len(), sample_config.sample_name);
                                     break;
                                 }
 
-                                let value_as_string = &line[sample_config.value_start_index.into()..(sample_config.value_start_index + sample_config.value_length).into()];
+                                let value_as_string = &line[sample_config.value_start_index.into()
+                                    ..(sample_config.value_start_index
+                                        + sample_config.value_length)
+                                        .into()];
                                 let mut value_as_float: f64 = match value_as_string.parse() {
                                     Ok(f) => f,
                                     Err(e) => {
@@ -110,7 +112,8 @@ impl P1Client {
                                             value: value_as_float,
                                         });
 
-                                        has_recorded_reading.insert(sample_config.prefix.clone(), true);
+                                        has_recorded_reading
+                                            .insert(sample_config.prefix.clone(), true);
                                     }
                                 }
 
