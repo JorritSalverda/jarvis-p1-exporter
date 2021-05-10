@@ -1,11 +1,11 @@
 use crate::model::{Config, ConfigSample, Measurement, MetricType, Sample};
-use std::io::{self, Write};
 use byteorder::{BigEndian, ByteOrder};
 use chrono::Utc;
 use conv::*;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
+use std::io::{self, Write};
 use std::time::Duration;
 use uuid::Uuid;
 
@@ -55,68 +55,68 @@ impl P1Client {
                     measured_at_time: Utc::now(),
                 };
 
-                let has_recorded_reading: HashMap<String, bool> = HashMap::new();
+                let mut has_recorded_reading: HashMap<String, bool> = HashMap::new();
 
                 while has_recorded_reading.len() < config.sample_configs.len() {
-
                     let mut serial_buf: Vec<u8> = vec![0; 1000];
                     match port.read(serial_buf.as_mut_slice()) {
                         Ok(t) => {
+                            // write to stdout
+                            io::stdout().write_all(&serial_buf[..t]).unwrap();
 
-                          // write to stdout
-                          io::stdout().write_all(&serial_buf[..t]).unwrap();
+                            let line = std::str::from_utf8(&serial_buf[..t])?;
 
-                          let line = std::str::from_utf8(&serial_buf[..t])?;
+                            for sample_config in config.sample_configs.iter() {
+                                if !line.starts_with(&sample_config.prefix) {
+                                    continue;
+                                }
 
-                          for sample_config in config.sample_configs.iter() {
-                            if !line.starts_with(&sample_config.prefix) {
-                              continue
+                                if line.len()
+                                    < (sample_config.value_start_index + sample_config.value_length).into()
+                                {
+                                    println!("Line with length {} is too short to extract value for reading '{}'", line.len(), sample_config.sample_name);
+                                    break;
+                                }
+
+                                let value_as_string = &line[sample_config.value_start_index.into()..(sample_config.value_start_index + sample_config.value_length).into()];
+                                let mut value_as_float: f64 = match value_as_string.parse() {
+                                    Ok(f) => f,
+                                    Err(e) => {
+                                        eprintln!(
+                                            "Failed parsing float '{}' for reading '{}': {}",
+                                            value_as_string, sample_config.sample_name, e
+                                        );
+                                        break;
+                                    }
+                                };
+
+                                value_as_float = value_as_float * sample_config.value_multiplier;
+                                println!("{}: {}", sample_config.sample_name, value_as_float);
+
+                                match has_recorded_reading.get(&sample_config.prefix) {
+                                    Some(_) => {
+                                        println!(
+                                            "A reading for {} has already been recorded",
+                                            sample_config.sample_name
+                                        )
+                                    }
+                                    None => {
+                                        measurement.samples.push(Sample {
+                                            entity_type: sample_config.entity_type,
+                                            entity_name: sample_config.entity_name.clone(),
+                                            sample_type: sample_config.sample_type,
+                                            sample_name: sample_config.sample_name.clone(),
+                                            metric_type: sample_config.metric_type,
+                                            value: value_as_float,
+                                        });
+
+                                        has_recorded_reading.insert(sample_config.prefix.clone(), true);
+                                    }
+                                }
+
+                                break;
                             }
-
-                            if line.len() < sample_config.value_start_index + sample_config.value_length {
-                              println!("Line with length {} is too short to extract value for reading '{}'", line.len(), sample_config.sample_name);
-                              break
-                            }
-
-                            let value_as_string = line[sample_config.value_start_index..sample_config.value_start_index+sample_config.value_length];
-                            let value_as_float: f64 = match value_as_string.parse() {
-                              Ok(f) => f,
-                              Err(e) => {
-                                eprintln!("Failed parsing float '{}' for reading '{}': {}", value_as_string, sample_config.sample_name, e);
-                                break
-                              }
-                            };
-
-                            value_as_float = value_as_float * sample_config.value_multiplier;
-                            println!("{}: {}", sample_config.sample_name, value_as_float);
-
-
-                            // 			if _, ok := hasRecordedReading[sc.Prefix]; !ok {
-                            // 				// init sample from config
-                            // 				sample := contractsv1.Sample{
-                            // 					EntityType: sc.EntityType,
-                            // 					EntityName: sc.EntityName,
-                            // 					SampleType: sc.SampleType,
-                            // 					SampleName: sc.SampleName,
-                            // 					MetricType: sc.MetricType,
-                            // 				}
-
-                            // 				sample.Value = valueAsFloat64
-
-                            // 				hasRecordedReading[sc.Prefix] = true
-
-                            // 				measurement.Samples = append(measurement.Samples, &sample)
-
-                            // measurement.samples.push(sample);
-
-                            // 			} else {
-                            // 				log.Warn().Msgf("A reading for %v has already been recorded", sc.SampleName)
-                            // 			}
-
-                            // 			break
-
-                          }
-                        },
+                        }
                         // if timeout just read again
                         Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
                         Err(e) => return Err(Box::new(e)),
@@ -187,35 +187,5 @@ impl P1Client {
         }
 
         sanitized_samples
-
-        // 	sanitizeSamples = []*contractsv1.Sample{}
-        // 	for _, cs := range currentSamples {
-        // 		// check if there's a corresponding sample in lastSamples and see if the difference with it's value isn't too large
-        // 		sanitize := false
-        // 		for _, ls := range lastSamples {
-        // 			if cs.EntityType == ls.EntityType &&
-        // 				cs.EntityName == ls.EntityName &&
-        // 				cs.SampleType == ls.SampleType &&
-        // 				cs.SampleName == ls.SampleName &&
-        // 				cs.MetricType == cs.MetricType {
-        // 				if cs.MetricType == contractsv1.MetricType_METRIC_TYPE_COUNTER && cs.Value < ls.Value {
-        // 					sanitize = true
-        // 					log.Warn().Msgf("Value for %v is less than the last sampled value %v, keeping previous value instead", cs, ls.Value)
-        // 					sanitizeSamples = append(sanitizeSamples, ls)
-        // 				} else if cs.MetricType == contractsv1.MetricType_METRIC_TYPE_COUNTER && cs.Value/ls.Value > 1.1 {
-        // 					sanitize = true
-        // 					log.Warn().Msgf("Value for %v is more than 10 percent larger than the last sampled value %v, keeping previous value instead", cs, ls.Value)
-        // 					sanitizeSamples = append(sanitizeSamples, ls)
-        // 				}
-
-        // 				break
-        // 			}
-        // 		}
-        // 		if !sanitize {
-        // 			sanitizeSamples = append(sanitizeSamples, cs)
-        // 		}
-        // 	}
-
-        // 	return
     }
 }
