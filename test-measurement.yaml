@@ -1,0 +1,11 @@
+Id: cc6e17bb-fd60-4dde-acc3-0cda7d752acc
+Source: jarvis-p1-exporter
+Location: My Home
+Samples:
+- EntityType: ENTITY_TYPE_TARIFF
+  EntityName: Sagemcom XS210
+  SampleType: SAMPLE_TYPE_ELECTRICITY_CONSUMPTION
+  SampleName: Levering dal
+  MetricType: METRIC_TYPE_COUNTER
+  Value: 9695872800.0
+MeasuredAtTime: 2021-05-01T05:45:03.043614293Z
