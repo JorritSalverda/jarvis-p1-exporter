@@ -4,10 +4,8 @@ use std::collections::HashMap;
 use std::env;
 use std::error::Error;
 use std::io::prelude::*;
-// use serialport::prelude::*;
-use std::io::{self,BufReader};
+use std::io::{self, BufReader};
 use std::time::Duration;
-use std::fs::File;
 use uuid::Uuid;
 
 pub struct P1ClientConfig {
@@ -41,7 +39,6 @@ impl P1Client {
         config: Config,
         last_measurement: Option<Measurement>,
     ) -> Result<Measurement, Box<dyn Error>> {
-
         // open usb serial port
         let port = serialport::new(&self.config.usb_device_path, 115200)
             .timeout(Duration::from_millis(10))
@@ -63,7 +60,6 @@ impl P1Client {
         while has_recorded_reading.len() < config.sample_configs.len() {
             match reader.read_line(&mut line) {
                 Ok(len) => {
-            
                     // write to stdout
                     println!("{}", &line);
 
@@ -72,16 +68,15 @@ impl P1Client {
                             continue;
                         }
 
-                        if len < (sample_config.value_start_index + sample_config.value_length)
-                                .into()
+                        if len
+                            < (sample_config.value_start_index + sample_config.value_length).into()
                         {
                             println!("Line with length {} is too short to extract value for reading '{}'", len, sample_config.sample_name);
                             break;
                         }
 
                         let value_as_string = &line[sample_config.value_start_index.into()
-                            ..(sample_config.value_start_index
-                                + sample_config.value_length)
+                            ..(sample_config.value_start_index + sample_config.value_length)
                                 .into()];
                         let mut value_as_float: f64 = match value_as_string.parse() {
                             Ok(f) => f,
@@ -114,8 +109,7 @@ impl P1Client {
                                     value: value_as_float,
                                 });
 
-                                has_recorded_reading
-                                    .insert(sample_config.prefix.clone(), true);
+                                has_recorded_reading.insert(sample_config.prefix.clone(), true);
                             }
                         }
 
