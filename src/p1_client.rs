@@ -39,6 +39,9 @@ impl P1Client {
         config: Config,
         last_measurement: Option<Measurement>,
     ) -> Result<Measurement, Box<dyn Error>> {
+
+        println!("Reading measurement from {}...", &self.config.usb_device_path);
+
         // open usb serial port
         let port = serialport::new(&self.config.usb_device_path, 115200)
             .timeout(Duration::from_millis(10))
@@ -135,7 +138,7 @@ impl P1Client {
         }
 
         println!(
-            "Retrieved measurement via p1 from device {}",
+            "Read measurement from {}",
             &self.config.usb_device_path
         );
 
