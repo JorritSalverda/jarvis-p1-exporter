@@ -3,8 +3,11 @@ use chrono::Utc;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
-use std::io::{self, Write};
+use std::io::prelude::*;
+// use serialport::prelude::*;
+use std::io::{self,BufReader};
 use std::time::Duration;
+use std::fs::File;
 use uuid::Uuid;
 
 pub struct P1ClientConfig {
@@ -38,115 +41,111 @@ impl P1Client {
         config: Config,
         last_measurement: Option<Measurement>,
     ) -> Result<Measurement, Box<dyn Error>> {
+
         // open usb serial port
         let port = serialport::new(&self.config.usb_device_path, 115200)
             .timeout(Duration::from_millis(10))
-            .open();
+            .open()?;
 
-        match port {
-            Ok(mut port) => {
-                let mut measurement = Measurement {
-                    id: Uuid::new_v4().to_string(),
-                    source: String::from("jarvis-p1-exporter"),
-                    location: config.location.clone(),
-                    samples: Vec::new(),
-                    measured_at_time: Utc::now(),
-                };
+        let mut line = String::new();
+        let mut reader = BufReader::new(port);
 
-                let mut has_recorded_reading: HashMap<String, bool> = HashMap::new();
+        let mut measurement = Measurement {
+            id: Uuid::new_v4().to_string(),
+            source: String::from("jarvis-p1-exporter"),
+            location: config.location.clone(),
+            samples: Vec::new(),
+            measured_at_time: Utc::now(),
+        };
 
-                while has_recorded_reading.len() < config.sample_configs.len() {
-                    let mut serial_buf: Vec<u8> = vec![0; 1000];
-                    match port.read(serial_buf.as_mut_slice()) {
-                        Ok(t) => {
-                            // write to stdout
-                            io::stdout().write_all(&serial_buf[..t]).unwrap();
+        let mut has_recorded_reading: HashMap<String, bool> = HashMap::new();
 
-                            let line = std::str::from_utf8(&serial_buf[..t])?;
+        while has_recorded_reading.len() < config.sample_configs.len() {
+            match reader.read_line(&mut line) {
+                Ok(len) => {
+            
+                    // write to stdout
+                    println!("{}", &line);
 
-                            for sample_config in config.sample_configs.iter() {
-                                if !line.starts_with(&sample_config.prefix) {
-                                    continue;
-                                }
+                    for sample_config in config.sample_configs.iter() {
+                        if !line.starts_with(&sample_config.prefix) {
+                            continue;
+                        }
 
-                                if line.len()
-                                    < (sample_config.value_start_index + sample_config.value_length)
-                                        .into()
-                                {
-                                    println!("Line with length {} is too short to extract value for reading '{}'", line.len(), sample_config.sample_name);
-                                    break;
-                                }
+                        if len < (sample_config.value_start_index + sample_config.value_length)
+                                .into()
+                        {
+                            println!("Line with length {} is too short to extract value for reading '{}'", len, sample_config.sample_name);
+                            break;
+                        }
 
-                                let value_as_string = &line[sample_config.value_start_index.into()
-                                    ..(sample_config.value_start_index
-                                        + sample_config.value_length)
-                                        .into()];
-                                let mut value_as_float: f64 = match value_as_string.parse() {
-                                    Ok(f) => f,
-                                    Err(e) => {
-                                        eprintln!(
-                                            "Failed parsing float '{}' for reading '{}': {}",
-                                            value_as_string, sample_config.sample_name, e
-                                        );
-                                        break;
-                                    }
-                                };
-
-                                value_as_float = value_as_float * sample_config.value_multiplier;
-                                println!("{}: {}", sample_config.sample_name, value_as_float);
-
-                                match has_recorded_reading.get(&sample_config.prefix) {
-                                    Some(_) => {
-                                        println!(
-                                            "A reading for {} has already been recorded",
-                                            sample_config.sample_name
-                                        )
-                                    }
-                                    None => {
-                                        measurement.samples.push(Sample {
-                                            entity_type: sample_config.entity_type,
-                                            entity_name: sample_config.entity_name.clone(),
-                                            sample_type: sample_config.sample_type,
-                                            sample_name: sample_config.sample_name.clone(),
-                                            metric_type: sample_config.metric_type,
-                                            value: value_as_float,
-                                        });
-
-                                        has_recorded_reading
-                                            .insert(sample_config.prefix.clone(), true);
-                                    }
-                                }
-
+                        let value_as_string = &line[sample_config.value_start_index.into()
+                            ..(sample_config.value_start_index
+                                + sample_config.value_length)
+                                .into()];
+                        let mut value_as_float: f64 = match value_as_string.parse() {
+                            Ok(f) => f,
+                            Err(e) => {
+                                eprintln!(
+                                    "Failed parsing float '{}' for reading '{}': {}",
+                                    value_as_string, sample_config.sample_name, e
+                                );
                                 break;
                             }
+                        };
+
+                        value_as_float = value_as_float * sample_config.value_multiplier;
+                        println!("{}: {}", sample_config.sample_name, value_as_float);
+
+                        match has_recorded_reading.get(&sample_config.prefix) {
+                            Some(_) => {
+                                println!(
+                                    "A reading for {} has already been recorded",
+                                    sample_config.sample_name
+                                )
+                            }
+                            None => {
+                                measurement.samples.push(Sample {
+                                    entity_type: sample_config.entity_type,
+                                    entity_name: sample_config.entity_name.clone(),
+                                    sample_type: sample_config.sample_type,
+                                    sample_name: sample_config.sample_name.clone(),
+                                    metric_type: sample_config.metric_type,
+                                    value: value_as_float,
+                                });
+
+                                has_recorded_reading
+                                    .insert(sample_config.prefix.clone(), true);
+                            }
                         }
-                        // if timeout just read again
-                        Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
-                        Err(e) => return Err(Box::new(e)),
+
+                        break;
                     }
                 }
-
-                println!(
-                    "Collected {} readings, stop reading for more",
-                    measurement.samples.len()
-                );
-
-                match last_measurement {
-                    Some(lm) => {
-                        measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
-                    }
-                    None => {}
-                }
-
-                println!(
-                    "Retrieved measurement via p1 from device {}",
-                    &self.config.usb_device_path
-                );
-
-                Ok(measurement)
+                // if timeout just read again
+                Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
+                Err(e) => return Err(Box::new(e)),
             }
-            Err(e) => return Err(Box::new(e)),
         }
+
+        println!(
+            "Collected {} readings, stop reading for more",
+            measurement.samples.len()
+        );
+
+        match last_measurement {
+            Some(lm) => {
+                measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
+            }
+            None => {}
+        }
+
+        println!(
+            "Retrieved measurement via p1 from device {}",
+            &self.config.usb_device_path
+        );
+
+        Ok(measurement)
     }
 
     fn sanitize_samples(

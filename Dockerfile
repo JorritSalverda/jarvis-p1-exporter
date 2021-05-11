@@ -1,6 +1,5 @@
 # Step 1: Build the application
-FROM rust:1.51  as builder
-# FROM rust:1.51-alpine  as builder
+FROM rust:1.52  as builder
 
 WORKDIR app
 
