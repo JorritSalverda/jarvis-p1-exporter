@@ -19,6 +19,6 @@ FROM scratch AS runtime
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/jarvis-p1-exporter .
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-USER 1000
+# USER 1000
 
 ENTRYPOINT ["./jarvis-p1-exporter"]
