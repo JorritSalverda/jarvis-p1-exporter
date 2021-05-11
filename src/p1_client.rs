@@ -47,7 +47,6 @@ impl P1Client {
             .timeout(Duration::from_millis(10))
             .open()?;
 
-        let mut line = String::new();
         let mut reader = BufReader::new(port);
 
         let mut measurement = Measurement {
@@ -61,15 +60,18 @@ impl P1Client {
         let mut has_recorded_reading: HashMap<String, bool> = HashMap::new();
 
         while has_recorded_reading.len() < config.sample_configs.len() {
+
+            let mut line = String::new();
             match reader.read_line(&mut line) {
                 Ok(len) => {
-                    // write to stdout
-                    println!("{}", &line);
+                    println!("{} ({} chars)", &line, len);
 
                     for sample_config in config.sample_configs.iter() {
                         if !line.starts_with(&sample_config.prefix) {
                             continue;
                         }
+
+                        println!("{} matches config {:?}", &line, &sample_config);
 
                         if len
                             < (sample_config.value_start_index + sample_config.value_length).into()

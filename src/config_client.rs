@@ -37,7 +37,7 @@ impl ConfigClient {
         let config_file_contents = fs::read_to_string(&self.config.config_path)?;
         let config: Config = serde_yaml::from_str(&config_file_contents)?;
 
-        println!("Loaded config from {}", &self.config.config_path);
+        println!("Loaded config from {}: {:?}", &self.config.config_path, &config);
 
         Ok(config)
     }
