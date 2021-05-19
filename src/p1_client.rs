@@ -1,4 +1,5 @@
-use crate::model::{Config, Measurement, MetricType, Sample};
+use crate::model::Config;
+use jarvis_lib::{Measurement, MetricType, Sample};
 use chrono::Utc;
 use std::collections::HashMap;
 use std::env;
