@@ -1,6 +1,7 @@
 use crate::model::Config;
-use jarvis_lib::{Measurement, MetricType, Sample};
 use chrono::Utc;
+use jarvis_lib::measurement_client::MeasurementClient;
+use jarvis_lib::model::{Measurement, MetricType, Sample};
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
@@ -30,18 +31,16 @@ pub struct P1Client {
     config: P1ClientConfig,
 }
 
-impl P1Client {
-    pub fn new(config: P1ClientConfig) -> Self {
-        Self { config }
-    }
-
-    pub fn get_measurement(
+impl MeasurementClient<Config> for P1Client {
+    fn get_measurement(
         &self,
         config: Config,
         last_measurement: Option<Measurement>,
     ) -> Result<Measurement, Box<dyn Error>> {
-
-        println!("Reading measurement from {}...", &self.config.usb_device_path);
+        println!(
+            "Reading measurement from {}...",
+            &self.config.usb_device_path
+        );
 
         // open usb serial port
         let port = serialport::new(&self.config.usb_device_path, 115200)
@@ -61,7 +60,6 @@ impl P1Client {
         let mut has_recorded_reading: HashMap<String, bool> = HashMap::new();
 
         while has_recorded_reading.len() < config.sample_configs.len() {
-
             let mut line = String::new();
             match reader.read_line(&mut line) {
                 Ok(len) => {
@@ -140,12 +138,15 @@ impl P1Client {
             None => {}
         }
 
-        println!(
-            "Read measurement from {}",
-            &self.config.usb_device_path
-        );
+        println!("Read measurement from {}", &self.config.usb_device_path);
 
         Ok(measurement)
+    }
+}
+
+impl P1Client {
+    pub fn new(config: P1ClientConfig) -> Self {
+        Self { config }
     }
 
     fn sanitize_samples(
