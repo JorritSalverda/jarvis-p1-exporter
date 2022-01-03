@@ -21,7 +21,7 @@ impl P1ClientConfig {
     }
 
     pub fn from_env() -> Result<Self, Box<dyn Error>> {
-        let usb_device_path = env::var("P1_USB_DEVICE_PATH").unwrap_or("/dev/ttyUSB0".to_string());
+        let usb_device_path = env::var("P1_USB_DEVICE_PATH").unwrap_or_else(|_| "/dev/ttyUSB0".to_string());
 
         Self::new(usb_device_path)
     }
@@ -93,7 +93,7 @@ impl MeasurementClient<Config> for P1Client {
                             }
                         };
 
-                        value_as_float = value_as_float * sample_config.value_multiplier;
+                        value_as_float *= sample_config.value_multiplier;
                         println!("{}: {}", sample_config.sample_name, value_as_float);
 
                         match has_recorded_reading.get(&sample_config.prefix) {
@@ -131,11 +131,8 @@ impl MeasurementClient<Config> for P1Client {
             measurement.samples.len()
         );
 
-        match last_measurement {
-            Some(lm) => {
-                measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
-            }
-            None => {}
+        if let Some(lm) = last_measurement {
+            measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
         }
 
         println!("Read measurement from {}", &self.config.usb_device_path);
@@ -167,16 +164,11 @@ impl P1Client {
                     && current_sample.metric_type == last_sample.metric_type
                 {
                     if current_sample.metric_type == MetricType::Counter
-                        && current_sample.value < last_sample.value
+                        && (current_sample.value < last_sample.value
+                            ||
+                            current_sample.value / last_sample.value > 1.1)
                     {
                         sanitize = true;
-                        // log.Warn().Msgf("Value for %v is less than the last sampled value %v, keeping previous value instead", cs, ls.Value)
-                        sanitized_samples.push(last_sample.clone());
-                    } else if current_sample.metric_type == MetricType::Counter
-                        && current_sample.value / last_sample.value > 1.1
-                    {
-                        sanitize = true;
-                        // log.Warn().Msgf("Value for %v is more than 10 percent larger than the last sampled value %v, keeping previous value instead", cs, ls.Value)
                         sanitized_samples.push(last_sample.clone());
                     }
 
