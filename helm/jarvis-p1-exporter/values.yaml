@@ -11,11 +11,8 @@ cronjob:
   ttlSecondsAfterFinished: 3600
 
 config:
-  bqEnable: false
-  bqInit: true
-  bqProjectID: gcp-project-id
-  bqDataset: jarvis
-  bqTable: jarvis_measurements
+  natsHost: jarvis-nats
+  natsSubject: jarvis-measurements
   configYaml: |
     location: My Home
     sampleConfigs:
@@ -55,9 +52,6 @@ config:
       prefix: 1-0:2.8.2
       valueStartIndex: 10
       valueLength: 10
-
-secret:
-  gcpServiceAccountKeyfile: '{}'
 
 logFormat: json
 

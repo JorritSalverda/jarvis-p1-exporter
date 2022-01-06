@@ -45,42 +45,23 @@ spec:
               value: {{ .Values.logFormat }}
             - name: P1_USB_DEVICE_PATH
               value: {{ .Values.cronjob.p1USBDevicePath }}
-            - name: BQ_ENABLE
-              valueFrom:
-                configMapKeyRef:
-                  key: bq-enable
-                  name: {{ include "jarvis-p1-exporter.fullname" . }}
-            - name: BQ_INIT
-              valueFrom:
-                configMapKeyRef:
-                  key: bq-init
-                  name: {{ include "jarvis-p1-exporter.fullname" . }}
-            - name: BQ_PROJECT_ID
+            - name: NATS_HOST
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "jarvis-p1-exporter.fullname" . }}
-                  key: bq-project-id
-            - name: BQ_DATASET
+                  key: nats-host
+            - name: NATS_SUBJECT
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "jarvis-p1-exporter.fullname" . }}
-                  key: bq-dataset
-            - name: BQ_TABLE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "jarvis-p1-exporter.fullname" . }}
-                  key: bq-table
+                  key: nats-subject
             - name: MEASUREMENT_FILE_CONFIG_MAP_NAME
               value: {{ include "jarvis-p1-exporter.fullname" . }}
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /secrets/keyfile.json
             resources:
               {{- toYaml .Values.resources | nindent 14 }}
             volumeMounts:
             - name: configs
               mountPath: /configs
-            - name: secrets
-              mountPath: /secrets
             - name: p1
               mountPath: {{ .Values.cronjob.p1USBDevicePath }}
           {{- with .Values.nodeSelector }}
@@ -100,10 +81,6 @@ spec:
           - name: configs
             configMap:
               name: {{ include "jarvis-p1-exporter.fullname" . }}
-          - name: secrets
-            secret:
-              defaultMode: 420
-              secretName: {{ include "jarvis-p1-exporter.fullname" . }}
           - name: p1
             hostPath:
               path: {{ .Values.cronjob.p1USBDevicePath }}
