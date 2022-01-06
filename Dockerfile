@@ -21,7 +21,6 @@ RUN cargo clippy --release --target x86_64-unknown-linux-musl --no-deps -- --den
 RUN cargo test --verbose --release --target x86_64-unknown-linux-musl
 
 FROM scratch AS runtime
-USER 1000
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/jarvis-p1-exporter .
 ENTRYPOINT ["./jarvis-p1-exporter"]
