@@ -45,7 +45,8 @@ impl MeasurementClient<Config> for P1Client {
         // open usb serial port
         let port = serialport::new(&self.config.usb_device_path, 115200)
             .timeout(Duration::from_millis(10))
-            .open()?;
+            .open()
+            .unwrap_or_else(|_| panic!("Failed to open usb serial port at {}", &self.config.usb_device_path));
 
         let mut reader = BufReader::new(port);
 
