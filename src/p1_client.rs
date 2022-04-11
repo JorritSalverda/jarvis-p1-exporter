@@ -21,7 +21,8 @@ impl P1ClientConfig {
     }
 
     pub fn from_env() -> Result<Self, Box<dyn Error>> {
-        let usb_device_path = env::var("P1_USB_DEVICE_PATH").unwrap_or_else(|_| "/dev/ttyUSB0".to_string());
+        let usb_device_path =
+            env::var("P1_USB_DEVICE_PATH").unwrap_or_else(|_| "/dev/ttyUSB0".to_string());
 
         Self::new(usb_device_path)
     }
@@ -46,7 +47,12 @@ impl MeasurementClient<Config> for P1Client {
         let port = serialport::new(&self.config.usb_device_path, 115200)
             .timeout(Duration::from_millis(10))
             .open()
-            .unwrap_or_else(|_| panic!("Failed to open usb serial port at {}", &self.config.usb_device_path));
+            .unwrap_or_else(|_| {
+                panic!(
+                    "Failed to open usb serial port at {}",
+                    &self.config.usb_device_path
+                )
+            });
 
         let mut reader = BufReader::new(port);
 
@@ -166,8 +172,7 @@ impl P1Client {
                 {
                     if current_sample.metric_type == MetricType::Counter
                         && (current_sample.value < last_sample.value
-                            ||
-                            current_sample.value / last_sample.value > 1.1)
+                            || current_sample.value / last_sample.value > 1.1)
                     {
                         sanitize = true;
                         sanitized_samples.push(last_sample.clone());
