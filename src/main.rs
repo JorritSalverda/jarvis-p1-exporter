@@ -9,6 +9,8 @@ use p1_client::{P1Client, P1ClientConfig};
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    json_env_logger::init();
+
     let p1_client_config = P1ClientConfig::from_env()?;
     let p1_client = P1Client::new(p1_client_config);
 
@@ -27,7 +29,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         state_client,
         Box::new(p1_client),
     )?;
-    let exporter_service = ExporterService::new(exporter_service_config);
+    let mut exporter_service = ExporterService::new(exporter_service_config);
 
     exporter_service.run().await?;
 

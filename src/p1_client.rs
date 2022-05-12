@@ -2,6 +2,7 @@ use crate::model::Config;
 use chrono::Utc;
 use jarvis_lib::measurement_client::MeasurementClient;
 use jarvis_lib::model::{Measurement, MetricType, Sample};
+use log::{debug, info};
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
@@ -16,7 +17,7 @@ pub struct P1ClientConfig {
 
 impl P1ClientConfig {
     pub fn new(usb_device_path: String) -> Result<Self, Box<dyn Error>> {
-        println!("P1ClientConfig::new(usb_device_path: {})", usb_device_path);
+        debug!("P1ClientConfig::new(usb_device_path: {})", usb_device_path);
         Ok(Self { usb_device_path })
     }
 
@@ -38,7 +39,7 @@ impl MeasurementClient<Config> for P1Client {
         config: Config,
         last_measurement: Option<Measurement>,
     ) -> Result<Measurement, Box<dyn Error>> {
-        println!(
+        info!(
             "Reading measurement from {}...",
             &self.config.usb_device_path
         );
@@ -70,19 +71,19 @@ impl MeasurementClient<Config> for P1Client {
             let mut line = String::new();
             match reader.read_line(&mut line) {
                 Ok(len) => {
-                    println!("{} ({} chars)", &line, len);
+                    info!("{} ({} chars)", &line, len);
 
                     for sample_config in config.sample_configs.iter() {
                         if !line.starts_with(&sample_config.prefix) {
                             continue;
                         }
 
-                        println!("{} matches config {:?}", &line, &sample_config);
+                        info!("{} matches config {:?}", &line, &sample_config);
 
                         if len
                             < (sample_config.value_start_index + sample_config.value_length).into()
                         {
-                            println!("Line with length {} is too short to extract value for reading '{}'", len, sample_config.sample_name);
+                            info!("Line with length {} is too short to extract value for reading '{}'", len, sample_config.sample_name);
                             break;
                         }
 
@@ -101,11 +102,11 @@ impl MeasurementClient<Config> for P1Client {
                         };
 
                         value_as_float *= sample_config.value_multiplier;
-                        println!("{}: {}", sample_config.sample_name, value_as_float);
+                        info!("{}: {}", sample_config.sample_name, value_as_float);
 
                         match has_recorded_reading.get(&sample_config.prefix) {
                             Some(_) => {
-                                println!(
+                                info!(
                                     "A reading for {} has already been recorded",
                                     sample_config.sample_name
                                 )
@@ -133,7 +134,7 @@ impl MeasurementClient<Config> for P1Client {
             }
         }
 
-        println!(
+        info!(
             "Collected {} readings, stop reading for more",
             measurement.samples.len()
         );
@@ -142,7 +143,7 @@ impl MeasurementClient<Config> for P1Client {
             measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
         }
 
-        println!("Read measurement from {}", &self.config.usb_device_path);
+        info!("Read measurement from {}", &self.config.usb_device_path);
 
         Ok(measurement)
     }
