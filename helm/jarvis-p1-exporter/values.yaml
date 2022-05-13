@@ -53,7 +53,7 @@ config:
       valueStartIndex: 10
       valueLength: 10
 
-logFormat: json
+logLevel: debug
 
 image:
   repository: jsalverda/jarvis-p1-exporter
