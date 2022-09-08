@@ -44,7 +44,7 @@ mod tests {
         let config: Config = config_client.read_config_from_file().unwrap();
 
         assert_eq!(config.location, "My Home".to_string());
-        assert_eq!(config.sample_configs.len(), 4);
+        assert_eq!(config.sample_configs.len(), 10);
 
         assert_eq!(config.sample_configs[0].entity_type, EntityType::Tariff);
         assert_eq!(

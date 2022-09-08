@@ -14,3 +14,7 @@ helm upgrade \
   --set secret.gcpServiceAccountKeyfile='{abc: blabla}' \
   --wait
 ```
+
+# Configuration
+
+See https://www.netbeheernederland.nl/_upload/Files/Slimme_meter_15_a727fce1f1.pdf for a list of Smart Meter codes.

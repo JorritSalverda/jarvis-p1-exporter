@@ -36,3 +36,57 @@ sampleConfigs:
   prefix: 1-0:2.8.2
   valueStartIndex: 10
   valueLength: 10
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_VOLTAGE
+  sampleName: Voltage L1
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:32.7.0
+  valueStartIndex: 11
+  valueLength: 5
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_VOLTAGE
+  sampleName: Voltage L2
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:52.7.0
+  valueStartIndex: 11
+  valueLength: 5
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_VOLTAGE
+  sampleName: Voltage L3
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:72.7.0
+  valueStartIndex: 11
+  valueLength: 5
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_CURRENT
+  sampleName: Current L1
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:31.7.0
+  valueStartIndex: 11
+  valueLength: 3
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_CURRENT
+  sampleName: Current L2
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:51.7.0
+  valueStartIndex: 11
+  valueLength: 3
+- entityType: ENTITY_TYPE_PHASE
+  entityName: Sagemcom XS210
+  sampleType: SAMPLE_TYPE_ELECTRICITY_CURRENT
+  sampleName: Current L3
+  metricType: METRIC_TYPE_GAUGE
+  valueMultiplier: 1
+  prefix: 1-0:71.7.0
+  valueStartIndex: 11
+  valueLength: 3
