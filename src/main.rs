@@ -9,7 +9,10 @@ use p1_client::{P1Client, P1ClientConfig};
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    json_env_logger::init();
+    tracing_subscriber::fmt()
+        .json()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
 
     let p1_client_config = P1ClientConfig::from_env()?;
     let p1_client = P1Client::new(p1_client_config);

@@ -2,13 +2,13 @@ use crate::model::Config;
 use chrono::Utc;
 use jarvis_lib::measurement_client::MeasurementClient;
 use jarvis_lib::model::{Measurement, MetricType, Sample};
-use log::{debug, info};
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::time::Duration;
+use tracing::{debug, info};
 use uuid::Uuid;
 
 pub struct P1ClientConfig {
@@ -34,13 +34,13 @@ pub struct P1Client {
 }
 
 impl MeasurementClient<Config> for P1Client {
-    fn get_measurement(
+    fn get_measurements(
         &self,
         config: Config,
-        last_measurement: Option<Measurement>,
-    ) -> Result<Measurement, Box<dyn Error>> {
+        last_measurements: Option<Vec<Measurement>>,
+    ) -> Result<Vec<Measurement>, Box<dyn Error>> {
         info!(
-            "Reading measurement from {}...",
+            "Reading measurements from {}...",
             &self.config.usb_device_path
         );
 
@@ -139,13 +139,16 @@ impl MeasurementClient<Config> for P1Client {
             measurement.samples.len()
         );
 
-        if let Some(lm) = last_measurement {
-            measurement.samples = self.sanitize_samples(measurement.samples, lm.samples)
+        if let Some(lm) = last_measurements {
+            if !lm.is_empty() {
+                measurement.samples =
+                    self.sanitize_samples(measurement.samples, &lm[lm.len() - 1].samples)
+            }
         }
 
-        info!("Read measurement from {}", &self.config.usb_device_path);
+        info!("Read measurements from {}", &self.config.usb_device_path);
 
-        Ok(measurement)
+        Ok(vec![measurement])
     }
 }
 
@@ -157,7 +160,7 @@ impl P1Client {
     fn sanitize_samples(
         &self,
         current_samples: Vec<Sample>,
-        last_samples: Vec<Sample>,
+        last_samples: &[Sample],
     ) -> Vec<Sample> {
         let mut sanitized_samples: Vec<Sample> = Vec::new();
 
