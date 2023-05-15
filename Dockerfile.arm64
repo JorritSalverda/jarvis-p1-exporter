@@ -5,7 +5,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
 RUN rustup target add aarch64-unknown-linux-musl
 RUN rustup component add clippy
-# Add vendored sources
 COPY vendor vendor
 COPY .cargo .cargo
 COPY . .

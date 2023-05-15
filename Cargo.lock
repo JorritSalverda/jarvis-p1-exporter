@@ -869,6 +869,7 @@ dependencies = [
  "chrono",
  "jarvis-lib",
  "kube",
+ "openssl",
  "serde",
  "serialport",
  "tokio",
