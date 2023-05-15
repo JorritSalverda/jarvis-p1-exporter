@@ -1,10 +1,10 @@
-FROM rust:1.69 as builder
-
 # Target platform triple. Leave unset to autodetect.
 ARG CARGO_BUILD_TARGET=
 
 # Set to true if using vendored sources
 ARG CARGO_NET_OFFLINE=false
+
+FROM rust:1.69 as builder
 
 ENV CARGO_TERM_COLOR=always \
     CARGO_NET_OFFLINE=false
@@ -19,6 +19,7 @@ COPY vendor vendor
 COPY .cargo .cargo
 COPY . .
 
+RUN cat .cargo/config.toml
 RUN cargo build --release
 RUN cargo clippy --release --no-deps -- --deny "warnings"
 RUN cargo test --release
