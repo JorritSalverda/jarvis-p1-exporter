@@ -1,16 +1,27 @@
 FROM rust:1.69 as builder
+
+# Target platform triple. Leave unset to autodetect.
+ARG CARGO_BUILD_TARGET=
+
+# Set to true if using vendored sources
+ARG CARGO_NET_OFFLINE=false
+
 ENV CARGO_TERM_COLOR=always \
     CARGO_NET_OFFLINE=false
+
 WORKDIR /app
+
 RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
-RUN rustup target add x86_64-unknown-linux-musl
+RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 RUN rustup component add clippy
+
 COPY vendor vendor
 COPY .cargo .cargo
 COPY . .
-RUN cargo build --release --target x86_64-unknown-linux-musl
-RUN cargo clippy --release --target x86_64-unknown-linux-musl --no-deps -- --deny "warnings"
-RUN cargo test --release --target x86_64-unknown-linux-musl
+
+RUN cargo build --release
+RUN cargo clippy --release --no-deps -- --deny "warnings"
+RUN cargo test --release
 
 FROM scratch AS runtime
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
