@@ -20,6 +20,8 @@ COPY .cargo .cargo
 COPY . .
 
 RUN cat .cargo/config.toml
+RUN cargo tree
+
 RUN cargo build --release
 RUN cargo clippy --release --no-deps -- --deny "warnings"
 RUN cargo test --release
