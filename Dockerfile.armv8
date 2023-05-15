@@ -1,12 +1,9 @@
-FROM arm64v8/rust:1.69 as chef
+FROM rust:1.69 as builder
 ENV CARGO_TERM_COLOR=always
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
 RUN rustup target add aarch64-unknown-linux-musl
 RUN rustup component add clippy
-
-FROM chef as builder
-# Build application
 COPY . .
 RUN cargo build --verbose --release --target aarch64-unknown-linux-musl
 RUN cargo clippy --release --target aarch64-unknown-linux-musl --no-deps -- --deny "warnings"
