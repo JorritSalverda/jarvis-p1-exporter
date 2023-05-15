@@ -44,7 +44,17 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm/v8
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=jsalverda/jarvis-p1-exporterbuild-cache
+          cache-to: type=registry,ref=jsalverda/jarvis-p1-exporter-build-cache,mode=max
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          file: Dockerfile.armv8
+          platforms: linux/arm/v8
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=jsalverda/jarvis-p1-exporterbuild-cache
