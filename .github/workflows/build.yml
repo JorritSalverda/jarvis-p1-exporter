@@ -48,8 +48,8 @@ jobs:
           platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=jsalverda/jarvis-p1-exporterbuild-cache
-          cache-to: type=registry,ref=jsalverda/jarvis-p1-exporter-build-cache,mode=max
+          # cache-from: type=registry,ref=jsalverda/jarvis-p1-exporterbuild-cache
+          # cache-to: type=registry,ref=jsalverda/jarvis-p1-exporter-build-cache,mode=max
       - uses: docker/build-push-action@v4
         with:
           context: .
