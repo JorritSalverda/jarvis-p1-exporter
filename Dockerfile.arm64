@@ -1,14 +1,14 @@
 FROM rust:1.69 as builder
-ENV CARGO_TERM_COLOR=always
+ENV CARGO_TERM_COLOR=always \
+    CARGO_UNSTABLE_SPARSE_REGISTRY=true
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
-RUN rustup toolchain install nightly
 RUN rustup target add aarch64-unknown-linux-musl
 RUN rustup component add clippy
 COPY . .
-RUN cargo +nightly build -Z sparse-registry --verbose --release --target aarch64-unknown-linux-musl
-RUN cargo +nightly clippy -Z sparse-registry --release --target aarch64-unknown-linux-musl --no-deps -- --deny "warnings"
-RUN cargo +nightly test -Z sparse-registry --verbose --release --target aarch64-unknown-linux-musl
+RUN cargo build --verbose --release --target aarch64-unknown-linux-musl
+RUN cargo clippy --release --target aarch64-unknown-linux-musl --no-deps -- --deny "warnings"
+RUN cargo test --verbose --release --target aarch64-unknown-linux-musl
 
 FROM scratch AS runtime
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
