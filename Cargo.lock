@@ -913,7 +913,7 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 [[package]]
 name = "jarvis-lib"
 version = "0.1.0"
-source = "git+https://github.com/JorritSalverda/jarvis-lib?tag=0.1.60#54c9761ae89aa2cbd0281373e0a1a87a2b20bec8"
+source = "git+https://github.com/JorritSalverda/jarvis-lib?tag=0.1.61#8b7ad0b0ebfb20f050c5f2287ded3494d326201d"
 dependencies = [
  "async-trait",
  "chrono",
@@ -927,6 +927,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tokio",
+ "tokio-rustls 0.24.0",
  "tracing",
  "uuid",
 ]

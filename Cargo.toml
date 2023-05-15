@@ -9,7 +9,7 @@ include = ["src/**/*", "LICENSE", "README.md"]
 
 [dependencies]
 chrono = "0.4"
-jarvis-lib = { git = "https://github.com/JorritSalverda/jarvis-lib", tag = "0.1.60" }
+jarvis-lib = { git = "https://github.com/JorritSalverda/jarvis-lib", tag = "0.1.61" }
 k8s-openapi = { version = "0.18.0", features = ["v1_26"] }
 kube = { version = "0.82", default-features = false, features = ["client", "runtime", "derive", "rustls-tls"] }
 serde = { version = "1.0", features = ["derive"] }
