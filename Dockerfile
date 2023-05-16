@@ -20,6 +20,8 @@ COPY .cargo .cargo
 COPY . .
 
 RUN cat .cargo/config.toml
+RUN cat Cargo.toml
+RUN cat Cargo.lock
 RUN cargo tree
 
 RUN cargo build --release
