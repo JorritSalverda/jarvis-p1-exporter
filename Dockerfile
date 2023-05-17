@@ -6,8 +6,8 @@ ARG CARGO_NET_OFFLINE=false
 
 FROM rust:1.69 as builder
 
-ENV CARGO_TERM_COLOR=always
-# CARGO_NET_OFFLINE=false
+ENV CARGO_TERM_COLOR=always \
+  CARGO_NET_OFFLINE=false
 
 WORKDIR /app
 
@@ -19,6 +19,8 @@ RUN rustup component add clippy
 # COPY .cargo .cargo
 COPY . .
 
+RUN rm -rf .cargo/config.toml
+# RUN rm -rf vendor
 # RUN cat .cargo/config.toml
 # RUN cat Cargo.toml
 # RUN cat Cargo.lock

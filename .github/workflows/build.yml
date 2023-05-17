@@ -68,14 +68,14 @@ jobs:
             target: aarch64-unknown-linux-musl
     steps:
       - uses: actions/checkout@v3
-      # - uses: actions/cache/restore@v3
-      #   with:
-      #     path: |
-      #       .cargo
-      #       vendor
-      #     key: cargo-vendor-release-${{ hashFiles('**/Cargo.lock') }}
-      #     enableCrossOsArchive: true
-      #     fail-on-cache-miss: true
+      - uses: actions/cache/restore@v3
+        with:
+          path: |
+            .cargo
+            vendor
+          key: cargo-vendor-release-${{ hashFiles('**/Cargo.lock') }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
