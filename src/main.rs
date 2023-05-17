@@ -1,14 +1,14 @@
 mod model;
 mod p1_client;
 
-use async_std::task;
 use jarvis_lib::config_client::{ConfigClient, ConfigClientConfig};
 use jarvis_lib::exporter_service::{ExporterService, ExporterServiceConfig};
 use jarvis_lib::nats_client::{NatsClient, NatsClientConfig};
 use jarvis_lib::state_client::{StateClient, StateClientConfig};
 use p1_client::{P1Client, P1ClientConfig};
 
-pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt()
         .json()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
@@ -17,10 +17,10 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let p1_client_config = P1ClientConfig::from_env()?;
     let p1_client = P1Client::new(p1_client_config);
 
-    let state_client_config = task::block_on(StateClientConfig::from_env())?;
+    let state_client_config = StateClientConfig::from_env().await?;
     let state_client = StateClient::new(state_client_config);
 
-    let nats_client_config = task::block_on(NatsClientConfig::from_env())?;
+    let nats_client_config = NatsClientConfig::from_env().await?;
     let nats_client = NatsClient::new(nats_client_config);
 
     let config_client_config = ConfigClientConfig::from_env()?;
@@ -34,7 +34,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
     let mut exporter_service = ExporterService::new(exporter_service_config);
 
-    task::block_on(exporter_service.run())?;
+    exporter_service.run().await?;
 
     Ok(())
 }
