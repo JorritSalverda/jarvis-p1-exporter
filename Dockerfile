@@ -19,10 +19,10 @@ RUN rustup component add clippy
 # COPY .cargo .cargo
 COPY . .
 
-RUN cat .cargo/config.toml
-RUN cat Cargo.toml
-RUN cat Cargo.lock
-RUN cargo tree
+# RUN cat .cargo/config.toml
+# RUN cat Cargo.toml
+# RUN cat Cargo.lock
+# RUN cargo tree
 
 RUN cargo build --release
 RUN cargo clippy --release --no-deps -- --deny "warnings"
