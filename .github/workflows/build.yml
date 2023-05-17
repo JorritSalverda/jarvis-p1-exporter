@@ -25,16 +25,21 @@ jobs:
     strategy:
       matrix:
         include:
-          # - platform: linux/amd64
-          #   target: x86_64-unknown-linux-musl
-          # - platform: linux/arm64
-          #   target: aarch64-unknown-linux-musl
           - platform: linux/amd64
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
           - platform: linux/arm64
-            target: aarch64-unknown-linux-gnu
+            target: aarch64-unknown-linux-musl
+          # - platform: linux/amd64
+          #   target: x86_64-unknown-linux-gnu
+          # - platform: linux/arm64
+          #   target: aarch64-unknown-linux-gnu
     steps:
       - uses: actions/checkout@v3
+      - name: Vendor sources
+        run: |
+          mkdir -p .cargo
+          mkdir -p vendor
+          cargo vendor --versioned-dirs --locked >.cargo/config.toml
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
