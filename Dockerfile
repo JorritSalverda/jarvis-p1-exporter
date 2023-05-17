@@ -13,7 +13,7 @@ RUN echo "BUILDPLATFORM: $BUILDPLATFORM"
 ARG TARGETPLATFORM
 RUN echo "TARGETPLATFORM: $TARGETPLATFORM"
 
-RUN mkdir -p .cargo/ \
+RUN mkdir -p .cargo \
   echo '[build]' > .cargo/config
 
 RUN case "$TARGETPLATFORM" in \
@@ -25,7 +25,7 @@ RUN case "$TARGETPLATFORM" in \
   ;; \
   esac
 
-RUN  cat .cargo/config
+RUN cat .cargo/config
 
 RUN apt update && apt upgrade -y
 RUN apt install -y g++-aarch64-linux-gnu libc6-dev-arm64-cross
