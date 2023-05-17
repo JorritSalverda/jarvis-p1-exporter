@@ -6,8 +6,8 @@ ARG CARGO_NET_OFFLINE=false
 
 FROM rust:1.69 as builder
 
-ENV CARGO_TERM_COLOR=always \
-  CARGO_NET_OFFLINE=false
+ENV CARGO_TERM_COLOR=always
+# CARGO_NET_OFFLINE=false
 
 WORKDIR /app
 
@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
 # RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 RUN rustup component add clippy
 
-COPY vendor vendor
-COPY .cargo .cargo
+# COPY vendor vendor
+# COPY .cargo .cargo
 COPY . .
 
 RUN cat .cargo/config.toml
