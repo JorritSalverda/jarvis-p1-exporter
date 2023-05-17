@@ -11,9 +11,9 @@ RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 COPY . .
 RUN cargo build --release
 
-FROM scratch AS runtime
+FROM debian:bullseye-slim AS runtime
 ARG CARGO_BUILD_TARGET=
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+# COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
 COPY --from=builder /app/target/${CARGO_BUILD_TARGET}/release/jarvis-p1-exporter .
 ENTRYPOINT ["./jarvis-p1-exporter"]
