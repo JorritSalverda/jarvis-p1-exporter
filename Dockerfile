@@ -19,7 +19,7 @@ RUN rustup component add clippy
 # COPY .cargo .cargo
 COPY . .
 
-RUN rm -rf .cargo/config.toml
+# RUN rm -rf .cargo/config.toml
 # RUN rm -rf vendor
 # RUN cat .cargo/config.toml
 # RUN cat Cargo.toml
