@@ -13,7 +13,7 @@ RUN echo "BUILDPLATFORM: $BUILDPLATFORM"
 ARG TARGETPLATFORM
 RUN echo "TARGETPLATFORM: $TARGETPLATFORM"
 
-RUN mkdir -p .cargo \
+RUN mkdir -p .cargo; \
   echo '[build]' > .cargo/config
 
 RUN case "$TARGETPLATFORM" in \
