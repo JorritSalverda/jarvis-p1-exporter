@@ -1,39 +1,20 @@
-# Target platform triple. Leave unset to autodetect.
-# ARG CARGO_BUILD_TARGET=
-
-# Set to true if using vendored sources
-ARG CARGO_NET_OFFLINE=false
-
 FROM rust:1.69 as builder
-
+ARG CARGO_BUILD_TARGET=
 ENV CARGO_TERM_COLOR=always \
-  # CARGO_NET_OFFLINE=false
   CARGO_NET_GIT_FETCH_WITH_CLI=true
-
 WORKDIR /app
-
 RUN apt-get update && apt-get install -y libudev-dev
-# RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
-# RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
+RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
+RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 RUN rustup component add clippy
-
-# COPY vendor vendor
-# COPY .cargo .cargo
 COPY . .
-
-# RUN rm -rf .cargo/config.toml
-# RUN rm -rf vendor
-# RUN cat .cargo/config.toml
-# RUN cat Cargo.toml
-# RUN cat Cargo.lock
-# RUN cargo tree
-
 RUN cargo build --release
 RUN cargo clippy --release --no-deps -- --deny "warnings"
 RUN cargo test --release
 
 FROM debian:bullseye-slim AS runtime
+ARG CARGO_BUILD_TARGET=
 # COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/jarvis-p1-exporter .
+COPY --from=builder /app/target/${CARGO_BUILD_TARGET}/release/jarvis-p1-exporter .
 ENTRYPOINT ["./jarvis-p1-exporter"]
