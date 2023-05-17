@@ -9,7 +9,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y musl-tools clang llvm libudev-dev
 RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 COPY . .
-RUN cargo test --release
+RUN cargo build --release
 
 FROM debian:bullseye-slim AS runtime
 ARG CARGO_BUILD_TARGET=
