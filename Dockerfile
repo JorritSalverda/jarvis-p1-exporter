@@ -3,8 +3,7 @@ ARG CARGO_BUILD_TARGET=
 ENV CARGO_TERM_COLOR=always \
   CARGO_NET_GIT_FETCH_WITH_CLI=true
 WORKDIR /app
-RUN apt-get update && apt-get install -y libudev-dev
-RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
+RUN apt-get update && apt-get install -y musl-tools libudev-dev
 RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 RUN rustup component add clippy
 COPY . .
