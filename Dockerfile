@@ -13,22 +13,20 @@ RUN echo "BUILDPLATFORM: $BUILDPLATFORM"
 ARG TARGETPLATFORM
 RUN echo "TARGETPLATFORM: $TARGETPLATFORM"
 
-RUN mkdir -p .cargo; \
-  echo '[build]' > .cargo/config
-
-RUN case "$TARGETPLATFORM" in \
+RUN mkdir -p .cargo ; \
+  echo '[build]' > .cargo/config ; \
+  case "$TARGETPLATFORM" in \
   "linux/amd64") \
   echo 'target = "x86_64-unknown-linux-gnu"' >> .cargo/config \
   ;; \
   "linux/arm64") \
   echo 'target = "aarch64-unknown-linux-gnu"' >> .cargo/config \
   ;; \
-  esac
-
-RUN cat .cargo/config
+  esac ; \
+  cat .cargo/config
 
 RUN apt update && apt upgrade -y
-RUN apt install -y g++-aarch64-linux-gnu libc6-dev-arm64-cross
+RUN apt install -y g++-aarch64-linux-gnu libc6-dev-arm64-cross libudev-sys
 
 RUN rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
 # RUN rustup toolchain install stable-aarch64-unknown-linux-gnu
