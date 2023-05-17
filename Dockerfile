@@ -6,7 +6,7 @@ ENV CARGO_TERM_COLOR=always \
   AR_aarch64_unknown_linux_musl=llvm-ar \
   CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
 WORKDIR /app
-RUN apt-get update && apt-get install -y musl-tools libudev-dev
+RUN apt-get update && apt-get install -y musl-tools clang llvm libudev-dev
 RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 COPY . .
 RUN cargo test --release
