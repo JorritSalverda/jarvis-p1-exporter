@@ -1,14 +1,14 @@
 FROM rust:1.69 as builder
 ARG CARGO_BUILD_TARGET=
 ENV CARGO_TERM_COLOR=always \
-  CARGO_NET_GIT_FETCH_WITH_CLI=true
+  CARGO_NET_GIT_FETCH_WITH_CLI=true \
+  CC_aarch64_unknown_linux_musl=clang \
+  AR_aarch64_unknown_linux_musl=llvm-ar \
+  CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
 WORKDIR /app
 RUN apt-get update && apt-get install -y musl-tools libudev-dev
 RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
-RUN rustup component add clippy
 COPY . .
-RUN cargo build --release
-RUN cargo clippy --release --no-deps -- --deny "warnings"
 RUN cargo test --release
 
 FROM debian:bullseye-slim AS runtime

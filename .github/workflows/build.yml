@@ -40,6 +40,8 @@ jobs:
           mkdir -p .cargo
           mkdir -p vendor
           cargo vendor --versioned-dirs --locked >.cargo/config.toml
+      - run: rustup component add clippy
+      - run: cargo clippy --no-deps -- --deny "warnings"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
