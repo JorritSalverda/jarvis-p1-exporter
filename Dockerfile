@@ -14,16 +14,18 @@ ARG TARGETPLATFORM
 RUN echo "TARGETPLATFORM: $TARGETPLATFORM"
 
 RUN mkdir -p .cargo/ \
-  echo '[build]' > .cargo/config \
-  case "$TARGETPLATFORM" in \
+  echo '[build]' > .cargo/config
+
+RUN case "$TARGETPLATFORM" in \
   "linux/amd64") \
   echo 'target = "x86_64-unknown-linux-gnu"' >> .cargo/config \
   ;; \
   "linux/arm64") \
   echo 'target = "aarch64-unknown-linux-gnu"' >> .cargo/config \
   ;; \
-  esac; \
-  cat .cargo/config
+  esac
+
+RUN  cat .cargo/config
 
 RUN apt update && apt upgrade -y
 RUN apt install -y g++-aarch64-linux-gnu libc6-dev-arm64-cross

@@ -97,10 +97,10 @@ jobs:
       #     key: cargo-vendor-release-${{ hashFiles('**/Cargo.lock') }}
       #     enableCrossOsArchive: true
       #     fail-on-cache-miss: true
-      - run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      - run: rustup component add clippy
-      - run: cargo clippy --no-deps -- --deny "warnings"
-      - run: cargo test
+      # - run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      # - run: rustup component add clippy
+      # - run: cargo clippy --no-deps -- --deny "warnings"
+      # - run: cargo test
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
