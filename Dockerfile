@@ -23,7 +23,7 @@ RUN mkdir -p .cargo ; \
   esac ; \
   cat .cargo/config
 
-RUN apt update && apt install --assume-yes --no-install-recommends g++-aarch64-linux-gnu libc6-dev-arm64-cross libudev-dev libssl-dev libssl-dev:arm64 libsasl2-dev
+RUN apt update && apt install --assume-yes --no-install-recommends g++-aarch64-linux-gnu libc6-dev-arm64-cross libudev-dev libssl-dev libsasl2-dev
 
 RUN rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
 RUN rustup toolchain install stable-aarch64-unknown-linux-gnu
