@@ -58,7 +58,7 @@ impl MeasurementClient<Config> for P1Client {
         let mut reader = BufReader::new(port);
 
         let mut measurement = Measurement {
-            id: Uuid::new_v4().to_string(),
+            id: Uuid::now_v7().to_string(),
             source: String::from("jarvis-p1-exporter"),
             location: config.location.clone(),
             samples: Vec::new(),
