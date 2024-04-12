@@ -42,13 +42,13 @@ jobs:
       - run: |
           sudo apt-get install --assume-yes --no-install-recommends \
             libudev-dev
-        if: matrix.platform.os == 'amd64'
+        if: matrix.platform.name == 'amd64'
       - run: |
           sudo apt-get install --assume-yes --no-install-recommends \
             libudev-dev \
             g++-aarch64-linux-gnu \
             libc6-dev-arm64-cross
-        if: matrix.platform.os == 'arm64'
+        if: matrix.platform.name == 'arm64'
       - run: cargo clippy --no-deps -- --deny "warnings"
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
