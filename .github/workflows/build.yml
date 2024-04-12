@@ -47,7 +47,9 @@ jobs:
           sudo apt-get install --assume-yes --no-install-recommends \
             libudev-dev \
             g++-aarch64-linux-gnu \
-            libc6-dev-arm64-cross
+            libc6-dev-arm64-cross \
+            libssl-dev \
+            libsasl2-dev
         if: matrix.platform.name == 'arm64'
       - run: cargo clippy --no-deps -- --deny "warnings"
       - name: Build binary
